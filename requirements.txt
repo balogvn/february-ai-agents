@@ -4,3 +4,4 @@ label-studio-sdk
 notion-client
 requests
 beautifulsoup4
+torch
