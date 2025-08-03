@@ -1,3 +1,9 @@
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+
 from agents.auto_annotator_agent import auto_annotate_text
 import json
 
