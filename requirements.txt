@@ -5,3 +5,4 @@ notion-client
 requests
 beautifulsoup4
 torch
+torch --index-url https://download.pytorch.org/whl/cpu
