@@ -1,0 +1,40 @@
+name: 🧠 February AI Auto-Annotate & Push
+
+on:
+  schedule:
+    - cron: '0 9 * * MON'  # Every Monday 9 AM
+  workflow_dispatch:       # Manual trigger support
+
+jobs:
+  run-annotation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run February AI Orchestrator
+        run: python orchestrator.py
+
+      - name: Push Results to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "balogvn@gmail.com"
+          git config --global user.name "February AI Bot"
+          git clone https://huggingface.co/datasets/balogvn/swahili-ner-dataset
+          cp annotations/swahili_export_with_model_version.json swahili-ner-dataset/data.json
+          cd swahili-ner-dataset
+          git add .
+          git commit -m "🔁 Auto-update from orchestrator"
+          git push https://balogvn:${HF_TOKEN}@huggingface.co/datasets/balogvn/swahili-ner-dataset HEAD:main
+
