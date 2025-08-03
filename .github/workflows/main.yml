@@ -24,8 +24,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: 🧠 Run February AI Orchestrator
-      run: python orchestrator.py
-      env:
-        PYTHONPATH: ${{ github.workspace }}
-
+        - name: 🧠 Run February AI Orchestrator
+        run: |
+          cd february-ai-agents
+          python orchestrator.py
+        env:
+          PYTHONPATH: ${{ github.workspace }}/february-ai-agents
+  
