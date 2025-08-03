@@ -1,4 +1,4 @@
-name: February AI Auto-Annotate & Push
+name: 🧠 Run February AI Orchestrator
 
 on:
   push:
@@ -26,4 +26,6 @@ jobs:
 
     - name: 🧠 Run February AI Orchestrator
       run: python orchestrator.py
+      env:
+        PYTHONPATH: ${{ github.workspace }}
 
