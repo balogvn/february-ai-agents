@@ -1,0 +1,158 @@
+[
+  {
+    "data": {
+      "text": "Raila Odinga visited Nairobi University."
+    },
+    "predictions": [
+      {
+        "result": [
+          {
+            "value": {
+              "start": 0,
+              "end": 4,
+              "labels": [
+                "PER"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          },
+          {
+            "value": {
+              "start": 4,
+              "end": 12,
+              "labels": [
+                "PER"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          },
+          {
+            "value": {
+              "start": 21,
+              "end": 39,
+              "labels": [
+                "ORG"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          }
+        ],
+        "model_version": "v1"
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "Uhuru Kenyatta was once president of Kenya."
+    },
+    "predictions": [
+      {
+        "result": [
+          {
+            "value": {
+              "start": 0,
+              "end": 2,
+              "labels": [
+                "PER"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          },
+          {
+            "value": {
+              "start": 2,
+              "end": 14,
+              "labels": [
+                "PER"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          },
+          {
+            "value": {
+              "start": 37,
+              "end": 42,
+              "labels": [
+                "LOC"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          }
+        ],
+        "model_version": "v1"
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "Amina Mohammed represented Kenya at the UN."
+    },
+    "predictions": [
+      {
+        "result": [
+          {
+            "value": {
+              "start": 0,
+              "end": 2,
+              "labels": [
+                "PER"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          },
+          {
+            "value": {
+              "start": 2,
+              "end": 14,
+              "labels": [
+                "PER"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          },
+          {
+            "value": {
+              "start": 27,
+              "end": 32,
+              "labels": [
+                "LOC"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          },
+          {
+            "value": {
+              "start": 40,
+              "end": 42,
+              "labels": [
+                "ORG"
+              ]
+            },
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels"
+          }
+        ],
+        "model_version": "v1"
+      }
+    ]
+  }
+]
