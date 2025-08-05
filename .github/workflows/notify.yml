@@ -1,0 +1,20 @@
+name: 📣 Notify on New Annotations
+
+on:
+  push:
+    paths:
+      - 'annotations/**'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout repo
+      uses: actions/checkout@v4
+
+    - name: 📲 Send Telegram notification
+      run: |
+        curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+        -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+        -d text="🆕 New annotations have been generated and committed to GitHub!\n📁 Folder: annotations/\n🔗 Repo: https://github.com/${{ github.repository }}/tree/main/annotations"
