@@ -29,8 +29,8 @@ def run():
     import_to_label_studio()
 
 def import_to_label_studio():
-    ls = Client(url="http://localhost:8080", api_key="YOUR_API_KEY")
-    project = ls.get_project(YOUR_PROJECT_ID)
+    ls = Client(url="http://localhost:8080", api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6ODA2MTU1MzEyMSwiaWF0IjoxNzU0MzUzMTIxLCJqdGkiOiJjYmMyNTIzNTIzODA0MWUyOWU5NzgwOWQ0ZTYzMmFjMiIsInVzZXJfaWQiOiIxIn0.Otgs3sCFYrbFQL0HpOYA1-XjJ0iAKK9Nh6wTs732IHk")
+    project = ls.get_project(1)
     project.import_tasks("annotations/swahili_export.json")
 
 if __name__ == "__main__":
