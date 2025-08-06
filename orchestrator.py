@@ -117,8 +117,13 @@ def run():
         log_info(f"✅ Annotations saved to {export_path}")
 
         # Generate metadata
-        generate_metadata("swahili_export.json", len(annotations), "sw", "dslim/bert-base-NER")
-
+        generate_metadata(
+            dataset_name="swahili-ner-dataset",
+            num_samples=len(annotations_clean) if isinstance(annotations_clean, list) else len(texts),
+            language="sw",
+            model_used="dslim/bert-base-NER",
+            output_path=metadata_path
+        )
         log_info("📝 Metadata.json generated")
 
         # Push to HF
