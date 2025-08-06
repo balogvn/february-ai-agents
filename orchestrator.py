@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from agents.auto_annotator_agent import auto_annotate_text
 from scripts.push_to_huggingface import push_files
-from scripts.generate_metadata import generate_metadata
+from scripts.generate_metadata import generate_dataset_metadata
 from scripts.logger import log_info, log_error
 from label_studio_sdk import Client
 import requests
@@ -117,12 +117,11 @@ def run():
         log_info(f"✅ Annotations saved to {export_path}")
 
         # Generate metadata
-        generate_metadata(
+        generate_dataset_metadata(
             dataset_name="swahili-ner-dataset",
             num_samples=len(annotations_clean) if isinstance(annotations_clean, list) else len(texts),
             language="sw",
-            model_used="dslim/bert-base-NER",
-            output_path=metadata_path
+            model_used="dslim/bert-base-NER"
         )
         log_info("📝 Metadata.json generated")
 
