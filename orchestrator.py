@@ -21,9 +21,9 @@ import requests
 
 def convert_numpy_types(obj):
     """Convert numpy types to Python native types for JSON serialization"""
-    if isinstance(obj, np.integer):
+    if isinstance(obj, (np.integer, np.int32, np.int64)):
         return int(obj)
-    elif isinstance(obj, np.floating):
+    elif isinstance(obj, (np.floating, np.float32, np.float64)):
         return float(obj)
     elif isinstance(obj, np.ndarray):
         return obj.tolist()
@@ -31,6 +31,8 @@ def convert_numpy_types(obj):
         return {key: convert_numpy_types(value) for key, value in obj.items()}
     elif isinstance(obj, list):
         return [convert_numpy_types(item) for item in obj]
+    elif hasattr(obj, 'item'):  # Handle single numpy scalars
+        return obj.item()
     else:
         return obj
 
@@ -90,7 +92,6 @@ def run():
         # Set up
         file_path = "data/swahili_news.json"
         export_path = "annotations/swahili_export.json"
-        metadata_path = "huggingface_dataset/metadata.json"
 
         log_info("🚀 Starting February AI pipeline")
         os.makedirs("annotations", exist_ok=True)
@@ -111,19 +112,20 @@ def run():
         log_info("🔄 Converting data types for JSON serialization...")
         annotations_clean = convert_numpy_types(annotations)
 
-        # Save annotations with proper encoding
+        # Save annotations with proper encoding and fallback serialization
         with open(export_path, "w", encoding='utf-8') as f:
-            json.dump(annotations_clean, f, indent=2, ensure_ascii=False)
+            json.dump(annotations_clean, f, indent=2, ensure_ascii=False, default=str)
         log_info(f"✅ Annotations saved to {export_path}")
 
-        # Generate metadata
+        # Generate metadata - Fixed function call
+        log_info("📝 Generating metadata...")
         generate_dataset_metadata(
             dataset_name="swahili-ner-dataset",
             num_samples=len(annotations_clean) if isinstance(annotations_clean, list) else len(texts),
             language="sw",
             model_used="dslim/bert-base-NER"
         )
-        log_info("📝 Metadata.json generated")
+        log_info("✅ Metadata generation completed")
 
         # Push to HF
         log_info("📤 Starting Hugging Face upload...")
