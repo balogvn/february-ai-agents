@@ -10,7 +10,8 @@ def generate_metadata(dataset_name, num_samples, language="sw", model_used="dsli
         "num_samples": num_samples,
         "language": language,
         "model_used": model_used,
-        "generated_at": datetime.now(datetime.UTC).isoformat() + "Z"
+       "generated_at": datetime.utcnow().isoformat() + "Z"
+
     }
 
     os.makedirs("annotations", exist_ok=True)
