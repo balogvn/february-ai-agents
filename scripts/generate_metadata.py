@@ -2,19 +2,18 @@ import json
 import os
 from datetime import datetime
 
-def generate_metadata(dataset_path, model_name="dslim/bert-base-NER", language="sw"):
-    with open(dataset_path) as f:
-        data = json.load(f)
-
+def generate_metadata(dataset_name, num_samples, language="sw", model_used="dslim/bert-base-NER"):
     metadata = {
-        "dataset_name": os.path.basename(dataset_path),
-        "num_samples": len(data),
+        "dataset_name": dataset_name,
+        "num_samples": num_samples,
         "language": language,
-        "model_used": model_name,
+        "model_used": model_used,
         "generated_at": datetime.utcnow().isoformat() + "Z"
     }
 
-    metadata_path = os.path.join(os.path.dirname(dataset_path), "metadata.json")
+    os.makedirs("annotations", exist_ok=True)
+    metadata_path = "annotations/metadata.json"
+
     with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
