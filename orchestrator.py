@@ -36,21 +36,57 @@ def convert_numpy_types(obj):
     else:
         return obj
 
-def notify_failure(error_message):
+def send_telegram_message(message, is_success=False):
+    """Send a message via Telegram"""
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    
     if not token or not chat_id:
         log_info("⚠️ Telegram credentials missing - skipping notification")
-        return
-    message = f"🚨 February AI Pipeline failed:\n\n{error_message}"
+        return False
+    
     try:
-        requests.post(f"https://api.telegram.org/bot{token}/sendMessage", data={
-            "chat_id": chat_id,
-            "text": message
-        })
-        log_info("📱 Failure notification sent via Telegram")
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage", 
+            data={
+                "chat_id": chat_id,
+                "text": message,
+                "parse_mode": "HTML"  # Allow HTML formatting
+            }
+        )
+        if response.status_code == 200:
+            emoji = "✅" if is_success else "📱"
+            log_info(f"{emoji} Telegram notification sent successfully")
+            return True
+        else:
+            log_error(f"Telegram API error: {response.status_code} - {response.text}")
+            return False
     except Exception as e:
         log_error(f"Failed to send Telegram notification: {e}")
+        return False
+
+def notify_failure(error_message):
+    """Send failure notification"""
+    message = f"🚨 <b>February AI Pipeline FAILED</b>\n\n❌ Error: {error_message}\n\n🕐 Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC"
+    send_telegram_message(message, is_success=False)
+
+def notify_success(stats):
+    """Send success notification with stats"""
+    message = f"""🎉 <b>February AI Pipeline SUCCESS!</b>
+
+✅ <b>Pipeline completed successfully</b>
+
+📊 <b>Stats:</b>
+• Texts processed: {stats.get('texts_processed', 'N/A')}
+• Annotations created: {stats.get('annotations_created', 'N/A')}
+• HuggingFace upload: {'✅ Success' if stats.get('hf_success') else '❌ Failed'}
+• Label Studio import: {'✅ Success' if stats.get('ls_success') else '⚠️ Skipped'}
+
+🕐 <b>Completed:</b> {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC
+
+🔗 Check your Hugging Face repository for the latest dataset!"""
+    
+    send_telegram_message(message, is_success=True)
 
 def import_to_label_studio():
     # Get credentials from environment variables (GitHub Secrets)
@@ -61,15 +97,15 @@ def import_to_label_studio():
     # Check if all credentials are available
     if not api_key:
         log_info("⚠️ LABEL_STUDIO_API_KEY not found - skipping Label Studio import")
-        return
+        return False
     
     if not url:
         log_info("⚠️ LABEL_STUDIO_URL not found - skipping Label Studio import")
-        return
+        return False
         
     if not project_id:
         log_info("⚠️ PROJECT_ID not found - skipping Label Studio import")
-        return
+        return False
 
     try:
         project_id = int(project_id)
@@ -80,14 +116,25 @@ def import_to_label_studio():
         project = ls.get_project(project_id)
         project.import_tasks("annotations/swahili_export.json")
         log_info("✅ Successfully imported to Label Studio")
+        return True
         
     except ValueError as e:
         log_error(f"❌ Invalid PROJECT_ID format: {e}")
+        return False
     except Exception as e:
         log_error(f"❌ Label Studio import failed: {e}")
         log_info("Continuing pipeline without Label Studio import...")
+        return False
 
 def run():
+    # Initialize stats for success notification
+    stats = {
+        'texts_processed': 0,
+        'annotations_created': 0,
+        'hf_success': False,
+        'ls_success': False
+    }
+    
     try:
         # Set up
         file_path = "data/swahili_news.json"
@@ -101,6 +148,7 @@ def run():
         with open(file_path) as f:
             data = json.load(f)
         texts = [item["text"] for item in data]
+        stats['texts_processed'] = len(texts)
         log_info(f"📄 Loaded {len(texts)} texts")
 
         # Annotate
@@ -111,17 +159,18 @@ def run():
         # Convert numpy types to JSON-serializable types
         log_info("🔄 Converting data types for JSON serialization...")
         annotations_clean = convert_numpy_types(annotations)
+        stats['annotations_created'] = len(annotations_clean) if isinstance(annotations_clean, list) else 1
 
         # Save annotations with proper encoding and fallback serialization
         with open(export_path, "w", encoding='utf-8') as f:
             json.dump(annotations_clean, f, indent=2, ensure_ascii=False, default=str)
         log_info(f"✅ Annotations saved to {export_path}")
 
-        # Generate metadata - Fixed function call
+        # Generate metadata
         log_info("📝 Generating metadata...")
         generate_dataset_metadata(
             dataset_name="swahili-ner-dataset",
-            num_samples=len(annotations_clean) if isinstance(annotations_clean, list) else len(texts),
+            num_samples=stats['annotations_created'],
             language="sw",
             model_used="dslim/bert-base-NER"
         )
@@ -129,14 +178,22 @@ def run():
 
         # Push to HF
         log_info("📤 Starting Hugging Face upload...")
-        push_files()
-        log_info("✅ Hugging Face push complete")
+        try:
+            push_files()
+            stats['hf_success'] = True
+            log_info("✅ Hugging Face push complete")
+        except Exception as e:
+            log_error(f"❌ Hugging Face push failed: {e}")
+            stats['hf_success'] = False
 
         # Load into Label Studio (with graceful failure handling)
         log_info("📥 Starting Label Studio import...")
-        import_to_label_studio()
+        stats['ls_success'] = import_to_label_studio()
 
         log_info("🎉 All tasks completed successfully!")
+        
+        # Send success notification
+        notify_success(stats)
 
     except FileNotFoundError as e:
         error_msg = f"File not found: {e}"
