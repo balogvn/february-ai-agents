@@ -4,7 +4,7 @@ import json
 import os
 from datetime import datetime
 
-def generate_metadata(dataset_name, num_samples, language="sw", model_used="dslim/bert-base-NER"):
+def generate_metadata(*, dataset_name, num_samples, language="sw", model_used="dslim/bert-base-NER"):
     metadata = {
         "dataset_name": dataset_name,
         "num_samples": num_samples,
