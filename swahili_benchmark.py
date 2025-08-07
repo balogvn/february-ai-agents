@@ -1,5 +1,5 @@
 import json
-from seqeval.metrics import classification_report
+from seqeval.metrics import classification_report, precision_score, recall_score, f1_score
 from transformers import AutoTokenizer
 
 # Load tokenizer
@@ -14,39 +14,52 @@ all_true_labels = []
 
 for item in dataset:
     text = item["data"]["text"]
-    tokens = tokenizer.tokenize(text)
-    token_offsets = tokenizer(text, return_offsets_mapping=True)["offset_mapping"]
+    tokenized = tokenizer(text, return_offsets_mapping=True, truncation=True)
+    tokens = tokenizer.convert_ids_to_tokens(tokenized["input_ids"])
+    offsets = tokenized["offset_mapping"]
 
-    # Ground truth placeholder (if available)
-    true_labels = ["O"] * len(tokens)
+    # Initialize labels
+    true_char_labels = ["O"] * len(text)
+    pred_char_labels = ["O"] * len(text)
 
-    # Prediction labels
-    pred_labels = ["O"] * len(tokens)
-
-    entities = item["predictions"][0]["result"]
-
-    for entity in entities:
-        label = entity["value"]["labels"][0]
-        start_char = entity["value"]["start"]
-        end_char = entity["value"]["end"]
-
-        for i, (start, end) in enumerate(token_offsets):
-            if start >= end_char:
-                break
-            if end <= start_char:
+    # Get TRUE labels from annotations
+    if "annotations" in item:
+        for ann in item["annotations"][0]["result"]:
+            if ann["type"] != "labels":
                 continue
-            if start >= start_char and end <= end_char:
-                if start == start_char:
-                    pred_labels[i] = f"B-{label}"
-                else:
-                    pred_labels[i] = f"I-{label}"
+            start = ann["value"]["start"]
+            end = ann["value"]["end"]
+            label = ann["value"]["labels"][0]
+            true_char_labels[start] = f"B-{label}"
+            for i in range(start + 1, end):
+                true_char_labels[i] = f"I-{label}"
 
-    all_predictions.append(pred_labels)
-    all_true_labels.append(true_labels)  # Placeholder since we don’t have gold labels
+    # Get PREDICTED labels
+    for pred in item["predictions"][0]["result"]:
+        if pred["type"] != "labels":
+            continue
+        start = pred["value"]["start"]
+        end = pred["value"]["end"]
+        label = pred["value"]["labels"][0]
+        pred_char_labels[start] = f"B-{label}"
+        for i in range(start + 1, end):
+            pred_char_labels[i] = f"I-{label}"
 
-# Since we don't have gold labels, we print only predicted labels
-for preds in all_predictions:
-    print(preds)
+    # Align with tokens
+    aligned_true = []
+    aligned_pred = []
+    for start, end in offsets:
+        if end == 0:
+            continue
+        aligned_true.append(true_char_labels[start] if start < len(true_char_labels) else "O")
+        aligned_pred.append(pred_char_labels[start] if start < len(pred_char_labels) else "O")
 
-# If you later add gold labels, uncomment this:
-# print(classification_report(all_true_labels,_
+    all_true_labels.append(aligned_true)
+    all_predictions.append(aligned_pred)
+
+# Evaluate
+print("📊 Classification Report")
+print(classification_report(all_true_labels, all_predictions))
+print("Precision: {:.1f}%".format(100 * precision_score(all_true_labels, all_predictions)))
+print("Recall:    {:.1f}%".format(100 * recall_score(all_true_labels, all_predictions)))
+print("F1 Score:  {:.1f}%".format(100 * f1_score(all_true_labels, all_predictions)))
