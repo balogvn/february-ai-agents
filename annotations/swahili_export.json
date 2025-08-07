@@ -16,7 +16,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.9994495511054993
           },
           {
             "value": {
@@ -28,7 +29,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.9660727977752686
           },
           {
             "value": {
@@ -40,7 +42,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.9965269565582275
           }
         ]
       }
@@ -63,7 +66,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.9996402263641357
           },
           {
             "value": {
@@ -75,7 +79,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.9559070467948914
           },
           {
             "value": {
@@ -87,7 +92,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.9998288154602051
           }
         ]
       }
@@ -110,7 +116,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.9996843338012695
           },
           {
             "value": {
@@ -122,7 +129,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.9585829973220825
           },
           {
             "value": {
@@ -134,7 +142,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.999843955039978
           },
           {
             "value": {
@@ -146,7 +155,8 @@
             },
             "from_name": "label",
             "to_name": "text",
-            "type": "labels"
+            "type": "labels",
+            "score": 0.9991003274917603
           }
         ]
       }

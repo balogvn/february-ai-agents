@@ -1,0 +1,7 @@
+{
+  "dataset_name": "swahili-ner-dataset",
+  "num_samples": 3,
+  "language": "sw",
+  "model_used": "dslim/bert-base-NER",
+  "generated_at": "2025-08-06T19:01:49.292522Z"
+}
